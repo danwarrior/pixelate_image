@@ -1,2 +1,3 @@
 # pixelate_image
 Code to pixelate an image...
+![Bob Dylan](/data/dylan_pixel.png)
