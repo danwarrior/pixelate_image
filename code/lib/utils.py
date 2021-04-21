@@ -97,5 +97,5 @@ def kMeans_pixelation(image: np.array, k: int) -> np.array:
     :param k:
     :return:
     '''
-    idx = segmentImgClrRGB(image, k)
-    return colorClustering(idx, image, k)
+    parcelated_image = parcelate_image(image, k)
+    return fill_parcelation(parcelated_image, image, k)
