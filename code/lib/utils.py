@@ -1,9 +1,7 @@
 
 import numpy as np
 import cv2
-import skimage
 from sklearn.cluster import KMeans
-from numpy import linalg as LA
 from matplotlib import pyplot as plt
 
 
@@ -40,46 +38,64 @@ def simple_pixelation(image: np.array, w: int, h: int) -> np.array:
     return cv2.resize(temp, (width, height), interpolation=cv2.INTER_NEAREST)
 
 
-def parcelate_image(idx, img, k):
+def fill_parcelation(parcel_image: np.array, image: np.array, k: int) -> np.array:
+    '''
+
+    :param parcel_image:
+    :param image:
+    :param k:
+    :return:
+    '''
     clusterValues = []
     for _ in range(0, k):
         clusterValues.append([])
 
-    for r in range(0, idx.shape[0]):
-        for c in range(0, idx.shape[1]):
-            clusterValues[idx[r][c]].append(img[r][c])
+    for r in range(0, parcel_image.shape[0]):
+        for c in range(0, parcel_image.shape[1]):
+            clusterValues[parcel_image[r][c]].append(image[r][c])
 
-    imgC = np.copy(img)
+    imageC = np.copy(image)
 
     clusterAverages = []
     for i in range(0, k):
         clusterAverages.append(np.average(clusterValues[i], axis=0))
 
-    for r in range(0, idx.shape[0]):
-        for c in range(0, idx.shape[1]):
-            imgC[r][c] = clusterAverages[idx[r][c]]
+    for r in range(0, parcel_image.shape[0]):
+        for c in range(0, parcel_image.shape[1]):
+            imageC[r][c] = clusterAverages[parcel_image[r][c]]
 
-    return imgC
+    return imageC
 
 
-def fill_parcelation(img, k):
-    imgC = np.copy(img)
+def parcelate_image(image: np.array, k: int) -> np.array:
+    '''
 
-    h = img.shape[0]
-    w = img.shape[1]
+    :param image:
+    :param k:
+    :return:
+    '''
+    imageC = np.copy(image)
 
-    imgC.shape = (img.shape[0] * img.shape[1], 3)
+    h = image.shape[0]
+    w = image.shape[1]
 
-    # 5. Run k-means on the vectorized responses X to get a vector of labels (the clusters);
-    #
-    kmeans = KMeans(n_clusters=k, random_state=0).fit(imgC).labels_
+    # vectorize image fom 2d to 1d
+    imageC.shape = (image.shape[0] * image.shape[1], 3)
 
-    # 6. Reshape the label results of k-means so that it has the same size as the input image
-    #   Return the label image which we call idx
+    # Find most-similar pixels using the 3 channels as features
+    kmeans = KMeans(n_clusters=k, random_state=42).fit(imageC).labels_
+
+    # Return the vector back to matrix form. Now we have a parcelation with k colors
     kmeans.shape = (h, w)
 
     return kmeans
 
-def kMeans_pixelation(image, k):
+def kMeans_pixelation(image: np.array, k: int) -> np.array:
+    '''
+
+    :param image:
+    :param k:
+    :return:
+    '''
     idx = segmentImgClrRGB(image, k)
     return colorClustering(idx, image, k)
