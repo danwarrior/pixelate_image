@@ -22,6 +22,13 @@ def display_images_pair(image1: np.array, image2: np.array) -> None:
     ax2 = fig.add_subplot(1,2,2)
     ax2.imshow(cv2.cvtColor(image2, cv2.COLOR_BGR2RGB))
 
+def display_images_plt(image1: np.array, image2: np.array) -> None:
+    fig = plt.figure(figsize=(15,20))
+    ax1 = fig.add_subplot(1,2,1)
+    ax1.imshow(image1)
+    ax2 = fig.add_subplot(1,2,2)
+    ax2.imshow(cv2.cvtColor(image2, cv2.COLOR_BGR2RGB))
+
 def simple_pixelation(image: np.array, w: int, h: int) -> np.array:
     # Save original image size
     height, width = image.shape[:2]
@@ -33,7 +40,7 @@ def simple_pixelation(image: np.array, w: int, h: int) -> np.array:
     return cv2.resize(temp, (width, height), interpolation=cv2.INTER_NEAREST)
 
 
-def colorClustering(idx, img, k):
+def parcelate_image(idx, img, k):
     clusterValues = []
     for _ in range(0, k):
         clusterValues.append([])
@@ -55,7 +62,7 @@ def colorClustering(idx, img, k):
     return imgC
 
 
-def segmentImgClrRGB(img, k):
+def fill_parcelation(img, k):
     imgC = np.copy(img)
 
     h = img.shape[0]
@@ -73,6 +80,6 @@ def segmentImgClrRGB(img, k):
 
     return kmeans
 
-def kMeansImage(image, k):
+def kMeans_pixelation(image, k):
     idx = segmentImgClrRGB(image, k)
     return colorClustering(idx, image, k)
